@@ -83,3 +83,29 @@ export async function getCctvStatus(roomId) {
 export function getStreamUrl(roomId) {
     return `${BASE_URL}/api/stream/${roomId}`;
 }
+
+export async function uploadVideo(roomId, file, frameSkip = 5) {
+    const formData = new FormData();
+    formData.append("room_id", roomId || "UploadedVideo");
+    formData.append("frame_skip", frameSkip);
+    formData.append("file", file);
+
+    return apiFetch(`${BASE_URL}/api/video/upload`, {
+        method: "POST",
+        body: formData,
+    });
+}
+
+export function getVideoStreamUrl(sessionId) {
+    return `${BASE_URL}/api/video/stream/${sessionId}`;
+}
+
+export async function cleanupVideoSession(sessionId) {
+    return apiFetch(`${BASE_URL}/api/video/cleanup/${sessionId}`, {
+        method: "POST",
+    });
+}
+
+export async function getVideoStreamStatus(sessionId) {
+    return apiFetch(`${BASE_URL}/api/video/status/${sessionId}`);
+}

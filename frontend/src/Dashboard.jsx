@@ -11,6 +11,7 @@ import { useEffect, useState, useCallback } from "react";
 import RoomCard from "./RoomCard";
 import WebcamTestMode from "./WebcamTestMode";
 import CctvRealMode from "./CctvRealMode";
+import VideoUpload from "./VideoUpload";
 import { fetchRooms } from "./api";
 
 export default function Dashboard() {
@@ -123,6 +124,12 @@ export default function Dashboard() {
         >
           📹 CCTV Real Mode
         </button>
+        <button
+          className={`tab-button ${activeTab === "upload" ? "active" : ""}`}
+          onClick={() => setActiveTab("upload")}
+        >
+          ⬆️ Upload Video
+        </button>
       </div>
 
       {/* Dashboard Tab - Auto-updating Live Status */}
@@ -162,6 +169,10 @@ export default function Dashboard() {
       {/* CCTV Real Mode Tab */}
       {activeTab === "cctv" && (
         <CctvRealMode rooms={rooms} onRoomsUpdate={loadRooms} />
+      )}
+
+      {activeTab === "upload" && (
+        <VideoUpload rooms={rooms} />
       )}
     </div>
   );

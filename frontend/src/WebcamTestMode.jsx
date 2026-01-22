@@ -10,6 +10,7 @@
 // Uses backend endpoints to start/stop camera process.
 
 import { useState, useEffect } from "react";
+import MjpegPlayer from "./MjpegPlayer";
 
 export default function WebcamTestMode({ rooms, onRoomsUpdate }) {
   const [webcamRunning, setWebcamRunning] = useState(false);
@@ -167,13 +168,35 @@ export default function WebcamTestMode({ rooms, onRoomsUpdate }) {
         >
           <strong>Camera is running</strong>
           <p style={{ margin: "10px 0 0 0", fontSize: "14px" }}>
-            A camera window should be visible on this device. Press ESC to stop.
+            Live camera feed displayed below with real-time person detection
           </p>
           {lastUpdate && (
             <p style={{ margin: "10px 0 0 0", fontSize: "12px", color: "#666" }}>
               Last updated: {lastUpdate}
             </p>
           )}
+        </div>
+      )}
+
+      {webcamRunning && (
+        <div
+          style={{
+            marginBottom: "20px",
+            borderRadius: "8px",
+            overflow: "hidden",
+            border: "2px solid #ddd",
+            backgroundColor: "#000",
+            minHeight: "400px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <MjpegPlayer
+            key="webcam-stream"
+            src="http://127.0.0.1:8002/api/webcam/stream"
+            alt="Live webcam feed"
+          />
         </div>
       )}
 
@@ -189,7 +212,7 @@ export default function WebcamTestMode({ rooms, onRoomsUpdate }) {
         <strong>How to use:</strong>
         <ol style={{ marginTop: "10px" }}>
           <li>Click "Start Camera Detection" button above</li>
-          <li>A camera window will open on your device</li>
+          <li>Live camera feed will appear below with detection boxes</li>
           <li>Move in front of the camera - lights turn ON</li>
           <li>Step away - lights turn OFF</li>
           <li>Check the Dashboard tab to see real-time updates</li>

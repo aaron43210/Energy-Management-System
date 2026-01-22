@@ -31,13 +31,22 @@ def run_webcam_energy_ai(
     camera_index: int = 0,
     show_video: bool = True
 ):
+    print(f"Attempting to open camera at index {camera_index} for room '{room_id}'...")
     cap = cv2.VideoCapture(camera_index)
+    
     if not cap.isOpened():
-        print(f"Error: Camera not accessible at index {camera_index} for room '{room_id}'.")
+        print(f"❌ Error: Camera not accessible at index {camera_index} for room '{room_id}'.")
+        print(f"   This could be due to:")
+        print(f"   1. Camera is already in use by another process")
+        print(f"   2. On macOS: Terminal/VS Code needs camera permissions (System Preferences > Security & Privacy > Camera)")
+        print(f"   3. Camera index {camera_index} is incorrect")
         return
 
-    print(f"Starting AI for '{room_id}'")
-    print(f"Camera opened. Press ESC to stop.")
+    # Set buffer size to reduce latency
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    
+    print(f"✅ Camera opened successfully for '{room_id}'")
+    print(f"Camera window display: {'ENABLED' if show_video else 'DISABLED'}")
     
     try:
         model = get_model()
@@ -145,18 +154,29 @@ def run_webcam_energy_ai(
                     1
                 )
 
-                cv2.imshow(f"Energy AI - {room_id} (Press ESC to exit)", frame)
-
-                if cv2.waitKey(1) & 0xFF == 27:
-                    print(f"ESC pressed. Stopping AI for '{room_id}'.")
-                    stop_event.set()
+                if show_video:
+                    try:
+                        cv2.imshow(f"Energy AI - {room_id} (Press ESC to exit)", frame)
+                        
+                        if cv2.waitKey(1) & 0xFF == 27:
+                            print(f"ESC pressed. Stopping AI for '{room_id}'.")
+                            stop_event.set()
+                    except Exception as e:
+                        print(f"⚠️ Warning: Could not display window ({e})")
+                        print(f"   Camera is running and processing frames in background")
+                        show_video = False  # Disable display for rest of session
+                else:
+                    # Still need to process events even without display
+                    time.sleep(0.01)
             
     finally:
         print(f"Stopping AI for '{room_id}'")
         cap.release()
         if show_video:
             cv2.destroyAllWindows()
-    
+
+
+if __name__ == "__main__":
     # Use a dummy room ID for testing
     TEST_ROOM_ID = "Demo Room"
     
